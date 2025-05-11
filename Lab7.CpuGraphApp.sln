@@ -5,6 +5,13 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab7.CpuMonitoringLibrary", "Lab7.CpuMonitoringLibrary\Lab7.CpuMonitoringLibrary.csproj", "{7C7AC94E-E595-40D6-9F06-0AE84CD82325}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab7.CpuMonitoringTester_Console", "CpuMonitoringTester_Console\Lab7.CpuMonitoringTester_Console.csproj", "{CB807544-02DC-4669-9C1A-5AF659198C6B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7C7AC94E-E595-40D6-9F06-0AE84CD82325} = {7C7AC94E-E595-40D6-9F06-0AE84CD82325}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CpuMonitoringLibrary.Tests", "CpuMonitoringLibrary.Tests\CpuMonitoringLibrary.Tests.csproj", "{05772C5B-8F76-41E9-900A-CC3E68B72342}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +22,14 @@ Global
 		{7C7AC94E-E595-40D6-9F06-0AE84CD82325}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C7AC94E-E595-40D6-9F06-0AE84CD82325}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C7AC94E-E595-40D6-9F06-0AE84CD82325}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB807544-02DC-4669-9C1A-5AF659198C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB807544-02DC-4669-9C1A-5AF659198C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB807544-02DC-4669-9C1A-5AF659198C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB807544-02DC-4669-9C1A-5AF659198C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05772C5B-8F76-41E9-900A-CC3E68B72342}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05772C5B-8F76-41E9-900A-CC3E68B72342}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05772C5B-8F76-41E9-900A-CC3E68B72342}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05772C5B-8F76-41E9-900A-CC3E68B72342}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
