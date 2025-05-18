@@ -16,16 +16,24 @@ public class ChartWindow : GameWindow
     private int _vertexBufferObject;
     private int _vertexArrayObject;
     private int _shaderProgram;
+    private int _projectionLocation;
 
-    private float[] _vertices = new float[120]; // 60 точок по 2 координати (x, y)
-    private Stopwatch _timer = new Stopwatch();
+
+    private readonly float[] _vertices;
+    private readonly Stopwatch _timer = new ();
+
+    private readonly int _updateInterval;
 
     public ChartWindow(ICpuDataProvider cpuDataProvider)
         : base(GameWindowSettings.Default, NativeWindowSettings.Default)
     {
         Title = "CPU Usage Graph";
-        Size = new Vector2i(800, 600);
         _cpuDataProvider = cpuDataProvider;
+
+        var historyCapacity = cpuDataProvider.HistoryCapacity;
+        _updateInterval = cpuDataProvider.UpdateInterval;
+
+        _vertices = new float[historyCapacity * 2]; // Ammout of dots in the chart history * axes count.
     }
 
     protected override void OnLoad()
@@ -40,15 +48,17 @@ public class ChartWindow : GameWindow
         GL.ShaderSource(vertexShader, vertexShaderSource);
         GL.CompileShader(vertexShader);
         GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int success);
+
         if (success == 0)
-            throw new Exception(GL.GetShaderInfoLog(vertexShader));
+            throw new InvalidOperationException(GL.GetShaderInfoLog(vertexShader));
 
         int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
         GL.ShaderSource(fragmentShader, fragmentShaderSource);
         GL.CompileShader(fragmentShader);
         GL.GetShader(fragmentShader, ShaderParameter.CompileStatus, out success);
+
         if (success == 0)
-            throw new Exception(GL.GetShaderInfoLog(fragmentShader));
+            throw new InvalidOperationException(GL.GetShaderInfoLog(fragmentShader));
 
         _shaderProgram = GL.CreateProgram();
         GL.AttachShader(_shaderProgram, vertexShader);
@@ -67,18 +77,27 @@ public class ChartWindow : GameWindow
         GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
         GL.EnableVertexAttribArray(0);
 
+        _projectionLocation = GL.GetUniformLocation(_shaderProgram, "uProjection");
+
         _timer.Start();
+    }
+
+    protected override void OnResize(ResizeEventArgs e)
+    {
+        base.OnResize(e);
+        GL.Viewport(0, 0, Size.X, Size.Y);
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
         base.OnUpdateFrame(args);
 
+        // Exit program.
         if (KeyboardState.IsKeyDown(Keys.Escape))
             Close();
 
-        // Оновлюємо кожну секунду
-        if (_timer.ElapsedMilliseconds >= 1000)
+        // Update chart.
+        if (_timer.ElapsedMilliseconds >= _updateInterval)
         {
             UpdateVertexData();
             _timer.Restart();
@@ -87,19 +106,18 @@ public class ChartWindow : GameWindow
 
     private void UpdateVertexData()
     {
-        var history = _cpuDataProvider.GetCpuUsageHistory(); // має повертати List<float> з максимум 60 значень
+        var history = _cpuDataProvider.GetCpuUsageHistory(); // Length is 60.
 
-        // Перетворюємо значення в нормалізовані координати
         for (int i = 0; i < history.Count; i++)
         {
-            float x = -1.0f + 2.0f * i / (history.Count - 1);         // від -1 до 1
-            float y = -1.0f + 2.0f * history[i] / 100f;               // 0–100% -> -1 до 1
+            float x = (float)i / (history.Count - 1) * Size.X;
+            float y = history[i] / 100f * Size.Y;
 
             _vertices[i * 2] = x;
             _vertices[i * 2 + 1] = y;
         }
 
-        // Оновлюємо GPU-буфер
+        // Update buffer.
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
         GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _vertices.Length * sizeof(float), _vertices);
     }
@@ -107,6 +125,9 @@ public class ChartWindow : GameWindow
     protected override void OnRenderFrame(FrameEventArgs args)
     {
         base.OnRenderFrame(args);
+
+        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(0, Size.X, 0, Size.Y, -1f, 1f);
+        GL.UniformMatrix4(_projectionLocation, false, ref projection);
 
         GL.Clear(ClearBufferMask.ColorBufferBit);
         GL.UseProgram(_shaderProgram);

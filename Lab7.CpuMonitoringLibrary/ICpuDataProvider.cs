@@ -9,10 +9,8 @@ namespace Lab7.CpuMonitoringLibrary
     /// </summary>
     public interface ICpuDataProvider : IDisposable
     {
-        /// <summary>
-        /// Gets the number of second of CPU usage history that is stored.
-        /// </summary>
-        int HistoryCapacitySeconds { get; }
+        public int HistoryCapacity { get; }
+        public int UpdateInterval { get; }
 
         /// <summary>
         /// Starts the periodic CPU usage data collection.
