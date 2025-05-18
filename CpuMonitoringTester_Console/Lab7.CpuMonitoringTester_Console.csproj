@@ -5,10 +5,26 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenTK" Version="4.9.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Lab7.CpuMonitoringLibrary\Lab7.CpuMonitoringLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Shaders\shader.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\shader.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,50 +1,36 @@
 ﻿using Lab7.CpuMonitoringLibrary;
-using System;
-using System.Threading;
-using System.Linq;
-using System.Data;
+using Lab7.CpuMonitoringTester_Console.Windows;
 
+namespace Lab7.CpuMonitoringTester_Console;
 
-public class Program
+public static class Program
 {
+    [STAThread]
     private static void Main(string[] args)
     {
+        var os = "Other OS";
+
+        if (OperatingSystem.IsWindows())
+        {
+            os = "Windows";
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            os = "Linux";
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            os = "MacOS";
+        }
+
         Console.WriteLine("CPU Monitoring Test");
-        Console.WriteLine($"Targeting: {(OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsLinux() ? "Linux" : OperatingSystem.IsMacOS() ? "macOS" : "Other OS")}");
+        Console.WriteLine($"Targeting: {os}");
 
-        ICpuDataProvider cpuMonitor = new CpuDataProvider(); // 60 seconds default 
+        ICpuDataProvider cpuMonitor = new CpuDataProvider(); // 60 seconds default
 
-        Console.WriteLine($"History capacity: {cpuMonitor.HistoryCapacitySeconds} seconds.");
         cpuMonitor.StartMonitoring();
+        using var window = new ChartWindow(cpuMonitor);
 
-        try
-        {
-            for (int i = 0; i < 120; i++) // 2 minutes
-            {
-                Thread.Sleep(2000); // Sleep 2 seconds
-                var history = cpuMonitor.GetCpuUsageHistory();
-
-                string historyString = string.Join(", ", history.Select(h => $"{h:F1}%"));
-                Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] CPU History ({history.Count} points): {historyString}");
-
-                if (history.Any())
-                {
-                    Console.WriteLine($"  Current (approx): {history.Last():F1}%");
-                }
-            }
-        }
-        catch (ThreadInterruptedException)
-        {
-            Console.WriteLine("Monitoring interrupted by user.");
-        }
-        finally
-        {
-            Console.WriteLine("Stopping monitoring...");
-            cpuMonitor.StopMonitoring();
-            cpuMonitor.Dispose();
-            Console.WriteLine("Monitoring stopped and resources disposed.");
-        }
-        Console.WriteLine("Test finished. Press any key to exit.");
-        Console.ReadKey();
+        window.Run();
     }
 }
