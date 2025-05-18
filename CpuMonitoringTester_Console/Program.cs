@@ -26,7 +26,7 @@ public static class Program
         Console.WriteLine("CPU Monitoring Test");
         Console.WriteLine($"Targeting: {os}");
 
-        var chartSize = 600; // ms.
+        var chartSize = 600; // dots.
         var updateInterval = 30; // ms.
 
         ICpuDataProvider cpuMonitor = new CpuDataProvider(chartSize, updateInterval);
